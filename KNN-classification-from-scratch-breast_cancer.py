@@ -17,17 +17,26 @@ new_point_scaled = scaler.transform([new_point])[0]
 def euclidean_distance(p,q):
     return np.sqrt(np.sum((p-q)**2))
 class KNN:
-    def __init__(self,k):
-        self.k = k
+    def __init__(self,radius):
+        self.radius = radius
+        self.k = 5
 
     def fit(self,X,y):
         self.X = X
         self.y = y
     def predict(self,new_point):
         distances = []
+        near_points = []
         for i in range(len(self.X)):
             distance = euclidean_distance(self.X[i],new_point)
             distances.append([distance,self.y[i]])
+            if(distance <= self.radius):
+                near_points.append([distance,self.y[i]])
+        if(len(near_points) != 0):
+            labels = [label for _,label in near_points]
+            result = Counter(labels).most_common(1)[0][0]
+            return result
+            
         distances.sort()
         nearest_neighbors = distances[:self.k]
         
@@ -36,7 +45,7 @@ class KNN:
         return result
 
 
-clf = KNN(k = 5)
+clf = KNN(5.10)
 clf.fit(x_scaled,y_colors)
 predicted_color = clf.predict(new_point_scaled)
 print(predicted_color)
